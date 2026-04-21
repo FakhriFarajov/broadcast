@@ -3,6 +3,7 @@ ARTICLES = [
         "id": 0,
         "title": "Sample Article",
         "category": "AI",
+        "tags": ["sample", "ai"],
         "description": "This is a sample article description.",
         "content": "This is the content of the sample article.",
         "author": "John Doe",
@@ -21,7 +22,7 @@ def get_article(id):
         if article["id"] == id:
             return article
 
-def create_article(title, content, description, image_url,category, author, created_at):
+def create_article(title, content, description, image_url, category, tags, author, created_at):
     global id_init
     article = {
         "id": id_init,
@@ -29,6 +30,7 @@ def create_article(title, content, description, image_url,category, author, crea
         "description": description,
         "content": content,
         "category": category,
+        "tags": tags,
         "author": author,
         "image_url": image_url,
         "created_at": created_at
@@ -36,4 +38,3 @@ def create_article(title, content, description, image_url,category, author, crea
     ARTICLES.append(article)
     id_init += 1
     return article
-

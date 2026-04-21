@@ -13,7 +13,6 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
-
 class Article(models.Model):
     title = models.CharField(max_length=120)
     description = models.TextField()
@@ -23,13 +22,13 @@ class Article(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
-    tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.JSONField(default=list, blank=True)
+    category = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         ordering = ['-created_on']
         verbose_name_plural = 'articles'
         verbose_name = 'article'
-
 
 class ArticleStats(models.Model):
     article = models.OneToOneField(Article, on_delete=models.CASCADE, related_name='stats')
@@ -41,8 +40,6 @@ class ArticleStats(models.Model):
         ordering = ['-views']
         verbose_name_plural = 'articles stats'
         verbose_name = 'articles stats'
-
-
 
 class ArticleComment(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
@@ -60,3 +57,14 @@ class ArticleComment(models.Model):
 
     def __str__(self):
         return f"Comment on {self.article.title}"
+
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name

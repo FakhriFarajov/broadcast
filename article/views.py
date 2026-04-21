@@ -56,6 +56,7 @@ def create_article(request):
                 form.cleaned_data['description'],
                 image_url,
                 form.cleaned_data['category'],
+                form.cleaned_data['tags'],
                 form.cleaned_data['author'],
                 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             )

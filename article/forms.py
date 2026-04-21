@@ -8,6 +8,7 @@ class CreateNewsForm(forms.Form):
     image = forms.ImageField(label="Image", required=True, widget=forms.ClearableFileInput(attrs={'class': 'form-control'}))
     author = forms.CharField(label="Author", required=True, max_length=120, widget=forms.TextInput(attrs={'class': 'form-control'}))
     category = forms.CharField(label="Category", required=True, max_length=60, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    tags = forms.CharField(label="Tags (comma-separated)", required=False, max_length=200, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     def clean_title(self):
         title = self.cleaned_data['title']
@@ -24,6 +25,18 @@ class CreateNewsForm(forms.Form):
             if i in category.lower():
                 raise ValidationError("category contains banned words")
         return category
+
+    def clean_tags(self):
+        tags_raw = self.cleaned_data['tags']
+        if not tags_raw:
+            return []
+        tags = [t.strip() for t in tags_raw.split(',') if t.strip()]
+        banned_words = ["nigger", "nigga"]
+        for tag in tags:
+            for banned in banned_words:
+                if banned in tag.lower():
+                    raise ValidationError("One or more tags contain banned words")
+        return tags
 
     def clean_content(self):
         content = self.cleaned_data['content']
