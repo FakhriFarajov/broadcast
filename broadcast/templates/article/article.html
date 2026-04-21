@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{article.title}}{% endblock %}
+
+{% block content %}
+<div class="article-container">
+    <div class="d-flex align-items-center">
+        <span class="tech-label">{{ article.category }}</span>
+    </div>
+
+    <h1 class="article-title">{{article.title}}</h1>
+
+    <img src="{{ article.image_url }}" class="hero-image">
+
+    <div class="metadata-bar d-flex justify-content-between align-items-end">
+        <div class="d-flex">
+            <div class="me-5">
+                <span class="meta-label">Published</span>
+                <span class="meta-value">{{ article.created_at }}</span>
+            </div>
+            <div class="me-5">
+                <span class="meta-label">Updated</span>
+                <span class="meta-value">2 Hours Ago</span>
+            </div>
+            <div>
+                <span class="meta-label">Terminal Hits</span>
+                <span class="meta-value text-cyan">42,901 Views</span>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn-terminal">👍 1.2k</button>
+            <button class="btn-terminal">Share</button>
+        </div>
+    </div>
+
+    <div class="blockquote-cyan">
+        {{article.description}}
+    </div>
+
+    <div>
+        {{article.content}}
+    </div>
+
+    <div class="code-wrapper">
+        <div class="code-top-bar">
+            <span>QUANTUM_GATE_INIT.PY</span>
+            <span class="text-cyan">PYTHON 3.12 (QUANTUM SDK)</span>
+        </div>
+        <pre><code>qc.h(qubit_a)
+qc.cx(qubit_a, qubit_b)
+return qc.measure_all()</code></pre>
+    </div>
+
+    <div class="author-card">
+        <img src="https://i.pravatar.cc/100?u=1" class="author-avatar">
+        <div>
+            <div class="text-cyan small fw-bold text-uppercase">Principal Researcher</div>
+            <h3 class="h4 mb-1">{{article.author}}</h3>
+            <p class="small text-muted mb-0">Systems architect specializing in quantum-classical hybrid systems.</p>
+        </div>
+    </div>
+
+    <div class="response-header">
+        <h3>Terminal Responses (12)</h3>
+        <button class="btn-terminal btn-sm">Post Response</button>
+    </div>
+
+    <div class="response-item">
+        <div>
+            <span class="comment-username">Dr_Heisenberg</span>
+            <span class="comment-time">34 min ago</span>
+        </div>
+        <p class="comment-text">Excellent breakdown of the NISQ noise floor issues. The readability is much better now!</p>
+        <a href="#" class="comment-reply">REPLY</a>
+    </div>
+</div>
+{% endblock %}

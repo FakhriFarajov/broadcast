@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- FULL WIDTH HERO SECTION -->
+<section class="hero-home" style="background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuCAhQ_qPhgoKN9X1fpjCo0_fTFfj_hq1tbEpdvSkSbiovrt8KXjLfWNIGFbngCynAj9SqRbTGdgUTDa73nVQ7b3ZT1RhH_uQDQyVgW3AIgoNs-_JeB8a-28Mj0VGBOMkEE1VvUifesCZVzuFkaOstsFROQedkY7TAiU6kdN0jpa5Ch7H0FaRF4KK3bRqygBCOEWaK10faHFks3Imv9gV65t4XgYbD9kdLozZx0q5peksvZXvSA-P4-D9Imo0FeYxohJs8XBtKrmrB0') center center/cover no-repeat; min-height: 480px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="mb-3">
+                    <span class="badge-critical">CRITICAL UPDATE</span>
+                    <span class="text-white small ms-3 ">12.04.2024 / 8 MIN READ</span>
+                </div>
+                <h1 class="article-title brand-font text-white">THE QUANTUM <br> <span class="text-cyan">COMPUTING</span> <br> REFACTOR</h1>
+                <p class="mb-5" style="max-width: 550px; font-size: 1.1rem; color: #fff;">
+                    As silicon reaches its physical limits, the industry pivots toward a new paradigm. We analyze how post-quantum cryptography is reshaping global security protocols in real-time.
+                </p>
+                <div class="d-flex gap-3">
+                    <button class="btn btn-investigation">READ INVESTIGATION &rarr;</button>
+                    <button class="btn btn-bookmark">BOOKMARK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MAIN CONTENT GRID -->
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <!-- LEFT: LATEST TRANSMISSIONS -->
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="brand-font h4 m-0 text-white">LATEST TRANSMISSIONS</h2>
+                <a href="#" class="text-cyan small fw-bold text-decoration-none">VIEW ALL LOGS</a>
+            </div>
+
+            <div class="row">
+                {% for article in articles %}
+                <div class="col-md-6 transmission-card mb-4">
+                    <div class="card-img-wrapper">
+                        <span class="card-category text-white">{{ article.category|truncatechars:15 }}</span>
+                        <img src="{{ article.image_url }}" alt="post" style="width:100%;object-fit:cover;">
+                    </div>
+                    <div class="small mb-1 text-white">{{ article.created_at }}</div>
+                    <h3 class="h5 fw-bold mb-2 text-white">{{ article.title }}</h3>
+                    <p class="small text-white">{{ article.description|truncatechars:80 }}</p>
+                </div>
+                {% empty %}
+                <div class="col-12"><p>No articles found.</p></div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- RIGHT: SIDEBAR -->
+        <div class="col-lg-4 ps-lg-5">
+            <h4 class="brand-font h6 mb-4 text-white">■ TRENDING NOW</h4>
+
+            <div class="trending-item d-flex align-items-start mb-4">
+                <div class="trending-number text-cyan">01</div>
+                <div>
+                    <div class="fw-bold small text-white">The death of the junior dev position?</div>
+                    <div class="text-white text-white" style="font-size: 0.65rem; color: #ffffff">1.2K READS / TODAY</div>
+                </div>
+            </div>
+
+            <div class="trending-item d-flex align-items-start mb-4">
+                <div class="trending-number text-cyan">02</div>
+                <div>
+                    <div class="fw-bold small text-white">Next.js 15: What we know so far</div>
+                    <div class="text-white" style="font-size: 0.65rem;">940 READS / TODAY</div>
+                </div>
+            </div>
+
+            <!-- BUFFER BOX -->
+            <div class="buffer-box">
+                <h4 class="brand-font h5 text-white">THE BUFFER</h4>
+                <p class="text-white small mb-4">A weekly briefing on the code and culture shaping our future.</p>
+                <input type="email" class="form-control buffer-input" placeholder="EMAIL_ADDRESS">
+                <button class="btn btn-light w-100 rounded-0 fw-bold small py-2">INITIALIZE SUBSCRIPTION</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BOTTOM SECTION: FROM THE SOURCE CODE -->
+<section class="container my-5 py-5 border-top border-secondary">
+    <div class="row align-items-center">
+        <div class="col-lg-5">
+            <h2 class="display-5 brand-font mb-4 text-white">FROM THE <br><span class="text-cyan">SOURCE CODE</span></h2>
+            <p class="mb-4" style="color: #444;">Join our community of 50k+ developers dissecting the latest pull requests.</p>
+            <div class="d-flex gap-2">
+                <button class="btn btn-white border-secondary rounded-0 btn-sm fw-bold px-3">GITHUB_SYNC</button>
+                <button class="btn btn-white border-secondary rounded-0 btn-sm fw-bold px-3">OPEN_SOURCE_CORE</button>
+            </div>
+        </div>
+        <div class="col-lg-7 mt-5 mt-lg-0">
+            <div class="code-window">
+                <div class="window-controls">
+                    <div class="dot dot-red"></div>
+                    <div class="dot dot-yellow"></div>
+                    <div class="dot dot-green"></div>
+                </div>
+                <pre class="m-0 p-4" style="font-size: 0.85rem;"><code><span class="text-cyan">async function</span> fetchBroadcastData() {
+  <span class="text-cyan">try</span> {
+    <span class="text-cyan">const</span> status = <span class="text-warning">"BROADCAST LIVE"</span>;
+    console.log(status);
+  } <span class="text-cyan">catch</span> (error) {
+    <span class="text-danger">throw new Error</span>(<span class="text-warning">'Interrupt'</span>);
+  }
+}</code></pre>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
