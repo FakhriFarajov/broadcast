@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center text-white">
+
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h1 class="serif-font brand-logo mb-0 text-white">DevStream</h1>
+        <div class="brand-subtitle text-white">Intellectual Rigor</div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card text-white">
+        <h2 class="serif-font mb-2 text-white">Welcome back</h2>
+        <p class="text-white mb-4">Log in to your developer workspace.</p>
+
+        <!-- Social Buttons -->
+        <div class="row g-3 mb-4">
+            <div class="col-6">
+                <button type="button" class="btn btn-social w-100 d-flex align-items-center justify-content-center text-white">
+                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="18" class="me-2 invert" style="filter: invert(1);" alt="GitHub"> GitHub
+                </button>
+            </div>
+            <div class="col-6">
+                <button type="button" class="btn btn-social w-100 d-flex align-items-center justify-content-center text-white">
+                    <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18" class="me-2" alt="Google"> Google
+                </button>
+            </div>
+        </div>
+
+        <div class="separator text-white">OR CONTINUE WITH EMAIL</div>
+
+        <!-- Form -->
+        <form method="post">
+            {% csrf_token %}
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error|escape }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error|escape }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <label class="form-label small text-uppercase fw-bold text-white" style="font-size: 0.7rem;">Username</label>
+                <input
+                    type="text"
+                    name="username"
+                    class="form-control text-white"
+                    placeholder="UserName"
+                    value="{% if form.username.value %}{{ form.username.value }}{% endif %}"
+                >
+            </div>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between">
+                    <label class="form-label small text-uppercase fw-bold text-white" style="font-size: 0.7rem;">Password</label>
+                    <a href="#" class="small text-white" style="font-size: 0.75rem;">Forgot password?</a>
+                </div>
+                <input type="password" name="password" class="form-control text-white" placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary-cyan w-100 mt-2">Log In</button>
+        </form>
+
+        <p class="text-center mt-4 mb-0 small text-white">
+            Don't have an account? <a href="{% url 'account:register' %}" class="text-white">Sign up for free</a>
+        </p>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="mt-5">
+        <div class="status-badge text-white">
+            <span class="status-dot"></span> SYSTEM STATUS: OPERATIONAL
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center text-white">
+
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h1 class="serif-font brand-logo mb-0 text-white">DevStream</h1>
+        <div class="brand-subtitle text-white">Intellectual Rigor</div>
+    </div>
+
+    <!-- Register Card -->
+    <div class="login-card text-white">
+        <h2 class="serif-font mb-2 text-white">Join DevStream</h2>
+        <p class="text-white mb-4">Create your account to start contributing to the feed.</p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error|escape }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error|escape }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="mb-4">
+                <label class="form-label small text-uppercase fw-bold text-white" style="font-size: 0.7rem;">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-4">
+                <label class="form-label small text-uppercase fw-bold text-white" style="font-size: 0.7rem;">Email Address</label>
+                {{ form.email }}
+            </div>
+            <div class="mb-4">
+                <label class="form-label small text-uppercase fw-bold text-white" style="font-size: 0.7rem;">Password</label>
+                {{ form.password }}
+            </div>
+            <div class="mb-4">
+                <label class="form-label small text-uppercase fw-bold text-white" style="font-size: 0.7rem;">Confirm Password</label>
+                {{ form.confirm_password }}
+            </div>
+
+            <button type="submit" class="btn w-100 mt-2" style="background-color: var(--brand-cyan); color: #fff; border: 1.5px solid #fff;">Create Account</button>
+        </form>
+
+        <p class="text-center mt-4 mb-0 small text-white">
+            Already have an account? <a href="{% url 'account:login' %}" class="text-white">Log in</a>
+        </p>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="mt-5">
+        <div class="status-badge text-white">
+            <span class="status-dot"></span> SYSTEM STATUS: OPERATIONAL
+        </div>
+    </div>
+
+</div>
+{% endblock %}

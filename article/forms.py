@@ -1,14 +1,47 @@
-from django import  forms
+from django import forms
 from django.core.exceptions import ValidationError
 
+from article.models import Category
+
+
 class CreateNewsForm(forms.Form):
-    title = forms.CharField(label="Title", required=True, max_length=120, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    description = forms.CharField(label="Description", required=True, widget=forms.Textarea(attrs={'class': 'form-control'}))
-    content = forms.CharField(label="Content", required=True, widget=forms.Textarea(attrs={'class': 'form-control'}))
-    image = forms.ImageField(label="Image", required=True, widget=forms.ClearableFileInput(attrs={'class': 'form-control'}))
-    author = forms.CharField(label="Author", required=True, max_length=120, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    category = forms.CharField(label="Category", required=True, max_length=60, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    tags = forms.CharField(label="Tags (comma-separated)", required=False, max_length=200, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    title = forms.CharField(
+        label="Title", 
+        required=True, 
+        max_length=120, 
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter article title'})
+    )
+    description = forms.CharField(
+        label="Description", 
+        required=True, 
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Brief description of the article'})
+    )
+    content = forms.CharField(
+        label="Content", 
+        required=True, 
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Full article content'})
+    )
+    category = forms.ModelChoiceField(
+        label="Category", 
+        required=True,
+        queryset=Category.objects.all(),
+        empty_label="Select a category",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    image = forms.ImageField(
+        label="Image",
+        required=True,
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+    )
+    minutes_read = forms.IntegerField(
+        label="Minutes to Read", 
+        required=True, 
+        min_value=1, 
+        max_value=120, 
+        initial=5,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Estimated reading time'})
+    )
+
 
     def clean_title(self):
         title = self.cleaned_data['title']
@@ -18,25 +51,6 @@ class CreateNewsForm(forms.Form):
                 raise ValidationError("Title contains banned words")
         return title
 
-    def clean_category(self):
-        category = self.cleaned_data['category']
-        banned_words = ["nigger", "nigga"]
-        for i in banned_words:
-            if i in category.lower():
-                raise ValidationError("category contains banned words")
-        return category
-
-    def clean_tags(self):
-        tags_raw = self.cleaned_data['tags']
-        if not tags_raw:
-            return []
-        tags = [t.strip() for t in tags_raw.split(',') if t.strip()]
-        banned_words = ["nigger", "nigga"]
-        for tag in tags:
-            for banned in banned_words:
-                if banned in tag.lower():
-                    raise ValidationError("One or more tags contain banned words")
-        return tags
 
     def clean_content(self):
         content = self.cleaned_data['content']
@@ -54,11 +68,90 @@ class CreateNewsForm(forms.Form):
                 raise ValidationError("Description contains banned words")
         return description
 
-    def clean_author(self):
-        author = self.cleaned_data['author']
+class EditArticleForm(forms.Form):
+    title = forms.CharField(
+        label="Title",
+        required=True,
+        max_length=120,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter article title'})
+    )
+    description = forms.CharField(
+        label="Description",
+        required=True,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Brief description of the article'})
+    )
+    content = forms.CharField(
+        label="Content",
+        required=True,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Full article content'})
+    )
+    category = forms.ModelChoiceField(
+        label="Category",
+        required=True,
+        queryset=Category.objects.all(),
+        empty_label="Select a category",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    image = forms.ImageField(
+        label="Image",
+        required=False,
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+    )
+    minutes_read = forms.IntegerField(
+        label="Minutes to Read",
+        required=True,
+        min_value=1,
+        max_value=120,
+        initial=5,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Estimated reading time'})
+    )
+
+
+    def clean_title(self):
+        title = self.cleaned_data['title']
         banned_words = ["nigger", "nigga"]
         for i in banned_words:
-            if i in author.lower():
-                raise ValidationError("Author contains banned words")
-        return author
+            if i in title.lower():
+                raise ValidationError("Title contains banned words")
+        return title
+
+
+    def clean_content(self):
+        content = self.cleaned_data['content']
+        banned_words = ["nigger", "nigga"]
+        for i in banned_words:
+            if i in content.lower():
+                raise ValidationError("Context contains banned words")
+        return content
+
+    def clean_description(self):
+        description = self.cleaned_data['description']
+        banned_words = ["nigger", "nigga"]
+        for i in banned_words:
+            if i in description.lower():
+                raise ValidationError("Description contains banned words")
+        return description
+
+class CreateComment(forms.Form):
+    comment = forms.CharField(
+        label="Comment",
+        required=True,
+        max_length=128,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control mb-3",
+                "rows": 3,
+                "placeholder": "Share your thoughts...",
+                "style": "resize: vertical;",
+            }
+        ),
+    )
+
+    def clean_comment(self):
+        banned_words = ["nigger", "nigga"]
+        comment = self.cleaned_data['comment']
+        for i in banned_words:
+            if i in comment.lower():
+                raise ValidationError("Comment contains banned words")
+        return comment
 

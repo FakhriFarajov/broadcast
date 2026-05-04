@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Create Article - DevStream{% endblock %}
+{% block title %}Edit Article - DevStream{% endblock %}
 
 {% block content %}
 <style>
@@ -15,7 +15,7 @@
         letter-spacing: 0.5px;
         margin-bottom: 0.5rem;
     }
-    .create-form-card {
+    .edit-form-card {
         background: var(--card-bg);
         border: 1px solid var(--border-color);
         border-radius: 8px;
@@ -26,11 +26,11 @@
 
 <div class="container" style="max-width: 1000px; margin: 0 auto;">
     <div class="text-center mb-5">
-        <h1 class="serif display-4 fw-bold mb-3">Create New Article</h1>
-        <p class="text-white-50" style="font-size: 1.1rem;">Share your knowledge with the community</p>
+        <h1 class="serif display-4 fw-bold mb-3">Edit Article</h1>
+        <p class="text-white-50" style="font-size: 1.1rem;">Update your article</p>
     </div>
 
-    <div class="create-form-card">
+    <div class="edit-form-card">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
@@ -76,7 +76,6 @@
                         {% endif %}
                     </div>
 
-
                     <div class="mb-4">
                         <label class="form-label">{{ form.minutes_read.label }}</label>
                         {{ form.minutes_read }}
@@ -86,7 +85,8 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label">{{ form.image.label }}</label>
+                        <label class="form-label">{{ form.image.label }} (Optional)</label>
+                        <div class="text-white-50 small mb-2">Current image: <a href="{{ article.image_link }}" target="_blank" class="text-cyan">View</a></div>
                         {{ form.image }}
                         {% if form.image.errors %}
                         <div class="text-danger small mt-1">{{ form.image.errors }}</div>
@@ -96,12 +96,13 @@
             </div>
 
             <div class="d-flex gap-3 justify-content-end mt-5 pt-4 border-top border-dev">
-                <a href="{% url 'main:main' %}" class="btn btn-ghost px-4 py-2">Cancel</a>
+                <a href="{% url 'article:article_by_id' article.id %}" class="btn btn-ghost px-4 py-2">Cancel</a>
                 <button type="submit" class="btn btn-cyan px-5 py-2 fw-bold text-uppercase">
-                    Publish Article
+                    Save Changes
                 </button>
             </div>
         </form>
     </div>
 </div>
 {% endblock %}
+

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}DevStream - Registration Success{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 col-xl-5">
+            <div class="login-card text-center">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-4"
+                     style="width: 4rem; height: 4rem; background: rgba(101, 230, 252, 0.15); border: 2px solid var(--brand-cyan);">
+                    <span style="font-size: 2rem;">✓</span>
+                </div>
+
+                <h1 class="serif h2 fw-bold mb-3" style="color: var(--brand-cyan);">Welcome Aboard!</h1>
+                <p class="text-white-50 mb-2" style="font-size: 1.1rem;">
+                    Your account has been created successfully.
+                </p>
+                <p class="mb-5">
+                    <strong class="text-white">{{ username }}</strong>
+                </p>
+
+                <div class="d-grid gap-3">
+                    <a href="{% url 'account:login' %}" class="btn btn-primary-cyan py-3 fw-bold">
+                        Sign In Now
+                    </a>
+                    <a href="{% url 'main:main' %}" class="btn btn-ghost py-2">
+                        Explore Articles
+                    </a>
+                </div>
+
+                <div class="mt-5 pt-4 border-top border-dev">
+                    <p class="text-white-50 small mb-0">
+                        Start contributing to the community by sharing your expertise
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

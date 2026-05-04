@@ -1,77 +1,188 @@
 {% extends 'base.html' %}
 
-{% block title %}{{article.title}}{% endblock %}
+{% block title %}{{ article.title }} - DevStream{% endblock %}
 
 {% block content %}
-<div class="article-container">
-    <div class="d-flex align-items-center">
-        <span class="tech-label">{{ article.category }}</span>
-    </div>
+<div class="container-fluid px-lg-5 pt-4 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
 
-    <h1 class="article-title">{{article.title}}</h1>
+            <!-- Article Header -->
+            <div class="mb-4">
+                <a href="{% url 'main:main' %}?category={{ article.category.name }}"
+                   class="badge bg-dark border border-cyan text-cyan text-decoration-none px-3 py-2 mb-3">
+                    {{ article.category.name|upper }}
+                </a>
 
-    <img src="{{ article.image_url }}" class="hero-image">
+                <h1 class="serif display-4 fw-bold mb-4 text-white" style="line-height: 1.2;">
+                    {{ article.title }}
+                </h1>
 
-    <div class="metadata-bar d-flex justify-content-between align-items-end">
-        <div class="d-flex">
-            <div class="me-5">
-                <span class="meta-label">Published</span>
-                <span class="meta-value">{{ article.created_at }}</span>
+                <p class="text-white-50 fs-5 mb-4" style="line-height: 1.7;">
+                    {{ article.description }}
+                </p>
+
+                <!-- Author & Meta Info -->
+                <div class="d-flex align-items-center gap-4 mb-4 pb-4 border-bottom border-dev">
+                    {% if author_profile.image %}
+                        <img src="{{ author_profile.image.url }}" alt="{{ article.author.username }}" class="rounded-circle border border-cyan" style="width: 50px; height: 50px; object-fit: cover;">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-dark border border-cyan"
+                             style="width: 50px; height: 50px; font-size: 1.5rem; color: var(--brand-cyan);">
+                            {{ article.author.username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <div class="text-white fw-bold">{{ article.author.username }}</div>
+                        <div class="text-white-50 small">
+                            {{ article.created_on|date:"F j, Y" }} •
+                            <span class="text-cyan">{{ article.minutes_read }} min read</span> •
+                            {{ article.stats.views|default:0 }} views
+                        </div>
+                    </div>
+                    <div class="ms-auto d-flex gap-2">
+                        <form method="post" action="{% url 'article:react_article' article.id 'like' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-ghost btn-sm px-3 {% if current_reaction == 'like' %}border-cyan text-cyan{% endif %}" type="submit">
+                                👍 {{ stats.likes|default:0 }}
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'article:react_article' article.id 'dislike' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-ghost btn-sm px-3 {% if current_reaction == 'dislike' %}border-cyan text-cyan{% endif %}" type="submit">
+                                👎 {{ stats.dislikes|default:0 }}
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'article:save' article.id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button class="btn btn-ghost btn-sm px-3" type="submit">
+                                {% if is_saved %}
+                                    ❌ Unsave
+                                {% else %}
+                                    💾 Save
+                                {% endif %}
+                            </button>
+                        </form>
+                        <button class="btn btn-ghost btn-sm px-3" type="button">
+                            🔗 Share
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="me-5">
-                <span class="meta-label">Updated</span>
-                <span class="meta-value">2 Hours Ago</span>
+
+            <!-- Featured Image -->
+            <div class="mb-5 rounded-3 overflow-hidden border border-dev">
+                <img src="{{ article.image_link }}" class="w-100" style="max-height: 500px; object-fit: cover;" alt="{{ article.title }}">
             </div>
-            <div>
-                <span class="meta-label">Terminal Hits</span>
-                <span class="meta-value text-cyan">42,901 Views</span>
+
+            <!-- Article Content -->
+            <article class="mb-5">
+                <div class="text-white-50" style="font-size: 1.1rem; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;">
+                    {{ article.content|linebreaks }}
+                </div>
+            </article>
+
+            <!-- Tags -->
+            {% if article.tags.all %}
+            <div class="mb-5 pb-4 border-bottom border-dev">
+                <div class="text-white-50 small mb-2">TAGS</div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for tag in article.tags.all %}
+                    <span class="badge bg-dark border border-dev text-white-50 px-3 py-2">
+                        #{{ tag.name }}
+                    </span>
+                    {% endfor %}
+                </div>
             </div>
+            {% endif %}
+
+            <!-- Author Card -->
+            <div class="card card-dev mb-5 p-4">
+                <div class="d-flex align-items-center gap-4">
+                    {% if author_profile.image %}
+                        <img src="{{ author_profile.image.url }}" alt="{{ article.author.username }}" class="rounded-circle border border-cyan" style="width: 80px; height: 80px; object-fit: cover;">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-dark border border-cyan"
+                             style="width: 80px; height: 80px; font-size: 2.5rem; color: var(--brand-cyan);">
+                            {{ article.author.username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <div class="text-cyan small fw-bold text-uppercase mb-1">Author</div>
+                        <h3 class="h4 mb-2 text-white">{{ article.author.username }}</h3>
+                        <p class="text-white-50 mb-0">
+                            Joined {{ article.author.date_joined|date:"F Y" }} •
+                            {{ article.author.articles.count }} articles published
+                        </p>
+                    </div>
+                    <a href="{% url 'profile:profile' %}" class="btn btn-cyan px-4">
+                        View Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-dev">
+                    <h3 class="h4 text-white mb-0">
+                        Discussion ({{ comment_count }})
+                    </h3>
+                    <button class="btn btn-cyan btn-sm px-4">
+                        Add Comment
+                    </button>
+                </div>
+
+                <!-- Comment Form -->
+                <div class="card card-dev p-4 mb-4">
+                    <form method="post" action="{% url 'article:create_comment' article.id %}">
+                        {% csrf_token %}
+                        {{ comment_form.comment }}
+                        {% if comment_form.comment.errors %}
+                        <div class="text-danger small mb-3">{{ comment_form.comment.errors }}</div>
+                        {% endif %}
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-cyan px-4">
+                                Post Comment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Comments List -->
+                {% for item in comments %}
+                <div class="card card-dev p-4 mb-3">
+                    <div class="d-flex gap-3">
+                        {% if item.author_profile.image %}
+                            <img src="{{ item.author_profile.image.url }}" alt="{{ item.comment.author.username }}" class="rounded-circle border border-cyan" style="width: 40px; height: 40px; object-fit: cover; flex-shrink: 0;">
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center rounded-circle bg-dark border border-dev"
+                                 style="width: 40px; height: 40px; font-size: 1.2rem; color: var(--brand-cyan); flex-shrink: 0;">
+                                {{ item.comment.author.username|slice:":1"|upper }}
+                            </div>
+                        {% endif %}
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="text-white fw-bold">{{ item.comment.author.username }}</span>
+                                    <span class="text-white-50 small ms-2">
+                                        {{ item.comment.created_on|timesince }} ago
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-white-50 mb-2">{{ item.comment.comment }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5">
+                    <div class="text-cyan mb-3" style="font-size: 3rem;">💬</div>
+                    <h4 class="text-white mb-2">No comments yet</h4>
+                    <p class="text-white-50">Be the first to share your thoughts!</p>
+                </div>
+                {% endfor %}
+            </div>
+
         </div>
-        <div class="d-flex gap-2">
-            <button class="btn-terminal">👍 1.2k</button>
-            <button class="btn-terminal">Share</button>
-        </div>
-    </div>
-
-    <div class="blockquote-cyan">
-        {{article.description}}
-    </div>
-
-    <div>
-        {{article.content}}
-    </div>
-
-    <div class="code-wrapper">
-        <div class="code-top-bar">
-            <span>QUANTUM_GATE_INIT.PY</span>
-            <span class="text-cyan">PYTHON 3.12 (QUANTUM SDK)</span>
-        </div>
-        <pre><code>qc.h(qubit_a)
-qc.cx(qubit_a, qubit_b)
-return qc.measure_all()</code></pre>
-    </div>
-
-    <div class="author-card">
-        <img src="https://i.pravatar.cc/100?u=1" class="author-avatar">
-        <div>
-            <div class="text-cyan small fw-bold text-uppercase">Principal Researcher</div>
-            <h3 class="h4 mb-1">{{article.author}}</h3>
-            <p class="small text-muted mb-0">Systems architect specializing in quantum-classical hybrid systems.</p>
-        </div>
-    </div>
-
-    <div class="response-header">
-        <h3>Terminal Responses (12)</h3>
-        <button class="btn-terminal btn-sm">Post Response</button>
-    </div>
-
-    <div class="response-item">
-        <div>
-            <span class="comment-username">Dr_Heisenberg</span>
-            <span class="comment-time">34 min ago</span>
-        </div>
-        <p class="comment-text">Excellent breakdown of the NISQ noise floor issues. The readability is much better now!</p>
-        <a href="#" class="comment-reply">REPLY</a>
     </div>
 </div>
 {% endblock %}

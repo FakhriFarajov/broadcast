@@ -1,0 +1,12 @@
+from django.urls import path
+
+from account.views import register_view, register_success_view, login_view, logout_view
+
+app_name = "account"
+
+urlpatterns = [
+    path('register/', register_view, name='register'),
+    path('register/success/', register_success_view, name='register_success'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout')
+]

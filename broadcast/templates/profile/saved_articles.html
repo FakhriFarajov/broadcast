@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Profile Header Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-auto">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-dark border border-dev"
+                 style="width: 120px; height: 120px; font-size: 3rem; color: var(--brand-cyan);">
+                {{ user.username|slice:":1"|upper }}
+            </div>
+        </div>
+        <div class="col ps-md-4">
+            <h1 class="serif display-4 fw-bold mb-2">{{ user.username }}</h1>
+            <p class="text-white-50 mb-4">
+                <span class="text-cyan">@{{ user.username }}</span> • Joined {{ user.date_joined|date:"M Y" }}
+            </p>
+
+            <!-- Stats -->
+            <div class="d-flex gap-5 mb-4 border-start border-cyan ps-4" style="border-width: 3px !important;">
+                <div>
+                    <div class="text-white fw-bold" style="font-size: 1.5rem;">{{ articles_created_count }}</div>
+                    <div class="text-white-50 small">Written Articles</div>
+                </div>
+                <div>
+                    <div class="text-white fw-bold" style="font-size: 1.5rem;">{{ articles_saved_count }}</div>
+                    <div class="text-white-50 small">Saved Articles</div>
+                </div>
+                <div>
+                    <div class="text-white fw-bold" style="font-size: 1.5rem;">{{ total_views|default:0 }}</div>
+                    <div class="text-white-50 small">Total Views</div>
+                </div>
+            </div>
+
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-3">
+                <a href="{% url 'article:create' %}" class="btn btn-cyan px-4 py-2 fw-bold">Create Article</a>
+                <a href="{% url 'account:logout' %}" class="btn btn-ghost px-4 py-2">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-underline mb-5 border-bottom border-dev">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active text-white border-bottom border-cyan{% else %}text-white-50{% endif %} pb-3"
+               href="{% url 'profile:profile' %}" style="{% if request.resolver_match.url_name == 'profile' %}border-width: 3px !important;{% endif %}">
+                My Articles
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'saved' %}active text-white border-bottom border-cyan{% else %}text-white-50{% endif %} pb-3"
+               href="{% url 'profile:saved' %}" style="{% if request.resolver_match.url_name == 'saved' %}border-width: 3px !important;{% endif %}">
+                Saved Articles
+            </a>
+        </li>
+    </ul>
+
+    <!-- Article List -->
+    <div class="row row-cols-1 g-4">
+        {% for article in articles %}
+        <div class="col">
+            <div class="card card-dev h-100 border-0">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <div class="position-relative overflow-hidden" style="height: 200px;">
+                            <img src="{{ article.image_link }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ article.title }}">
+                            <span class="position-absolute top-0 end-0 m-3 badge bg-dark border border-dev text-cyan small fw-bold">
+                                {{ article.category.name|upper|default:'GENERAL' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body px-4 py-4">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <span class="text-white-50 small">{{ article.created_on|date:"Y-m-d" }}</span>
+                                <span class="text-white-50 small">•</span>
+                                <span class="text-cyan small fw-bold">{{ article.minutes_read|default:5 }} min read</span>
+                            </div>
+
+                            <h3 class="serif h4 mb-3">
+                                <a href="{% url 'article:article_by_id' article.id %}" class="text-white text-decoration-none">{{ article.title }}</a>
+                            </h3>
+
+                            <p class="text-white-50 mb-4" style="font-size: 0.9rem; line-height: 1.6;">
+                                {{ article.description|truncatewords:20 }}
+                            </p>
+
+                            <div class="d-flex gap-4 align-items-center">
+                                <a href="{% url 'article:article_by_id' article.id %}" class="text-cyan text-decoration-none small fw-bold">
+                                    Read Article →
+                                </a>
+                                <span class="text-white-50 small ms-auto">
+                                    <span class="text-white fw-bold">{{ article.stats.views|default:0 }}</span> views
+                                </span>
+                                {% if request.user == article.author %}
+                                <a href="{% url 'article:edit' article.id %}" class="btn btn-ghost btn-sm px-3" style="font-size: 0.75rem;">
+                                    ✏️ Edit
+                                </a>
+                                {%endif%}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="text-cyan mb-3" style="font-size: 3rem;">📝</div>
+            <h3 class="text-white mb-3">No articles yet</h3>
+            <p class="text-white-50 mb-4">Start sharing your knowledge with the community</p>
+            <a href="{% url 'article:create' %}" class="btn btn-cyan px-5 py-3 fw-bold">
+                Create Your First Article
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
