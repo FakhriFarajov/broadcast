@@ -115,22 +115,19 @@ def create_article(request):
 def edit_article(request, id):
     article = get_object_or_404(Article, id=id)
     
-    # Only author can edit
     if article.author != request.user:
         return redirect("article:article_by_id", id=id)
     
     if request.method == "POST":
         form = EditArticleForm(request.POST, request.FILES)
         if form.is_valid():
-            image_url = article.image_link  # Keep existing image by default
+            image_url = article.image_link
             image_file = form.cleaned_data.get("image")
             
-            # Upload new image if provided
             if image_file:
                 upload_result = cloudinary.uploader.upload(image_file)
                 image_url = upload_result.get("url")
             
-            # Update article
             article.title = form.cleaned_data["title"]
             article.content = form.cleaned_data["content"]
             article.description = form.cleaned_data["description"]
@@ -140,7 +137,6 @@ def edit_article(request, id):
             
             return redirect("article:article_by_id", id=id)
     else:
-        # Pre-fill form with existing article data
         form = EditArticleForm(initial={
             "title": article.title,
             "description": article.description,

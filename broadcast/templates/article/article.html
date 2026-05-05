@@ -96,31 +96,6 @@
             </div>
             {% endif %}
 
-            <!-- Author Card -->
-            <div class="card card-dev mb-5 p-4">
-                <div class="d-flex align-items-center gap-4">
-                    {% if author_profile.image %}
-                        <img src="{{ author_profile.image.url }}" alt="{{ article.author.username }}" class="rounded-circle border border-cyan" style="width: 80px; height: 80px; object-fit: cover;">
-                    {% else %}
-                        <div class="d-flex align-items-center justify-content-center rounded-circle bg-dark border border-cyan"
-                             style="width: 80px; height: 80px; font-size: 2.5rem; color: var(--brand-cyan);">
-                            {{ article.author.username|slice:":1"|upper }}
-                        </div>
-                    {% endif %}
-                    <div class="flex-grow-1">
-                        <div class="text-cyan small fw-bold text-uppercase mb-1">Author</div>
-                        <h3 class="h4 mb-2 text-white">{{ article.author.username }}</h3>
-                        <p class="text-white-50 mb-0">
-                            Joined {{ article.author.date_joined|date:"F Y" }} •
-                            {{ article.author.articles.count }} articles published
-                        </p>
-                    </div>
-                    <a href="{% url 'profile:profile' %}" class="btn btn-cyan px-4">
-                        View Profile
-                    </a>
-                </div>
-            </div>
-
             <!-- Comments Section -->
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-dev">
