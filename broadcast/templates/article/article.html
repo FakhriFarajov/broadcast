@@ -96,7 +96,6 @@
             </div>
             {% endif %}
 
-            <!-- Comments Section -->
             <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-dev">
                     <h3 class="h4 text-white mb-0">
@@ -107,7 +106,6 @@
                     </button>
                 </div>
 
-                <!-- Comment Form -->
                 <div class="card card-dev p-4 mb-4">
                     <form method="post" action="{% url 'article:create_comment' article.id %}">
                         {% csrf_token %}
