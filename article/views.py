@@ -55,7 +55,6 @@ def article_view(request, id):
     }
     return render(request, "article/article.html", context)
 
-
 @login_required
 @transaction.atomic
 def react_article(request, id, reaction_type):
@@ -104,7 +103,6 @@ def create_article(request):
                 image_link=image_url,
                 category=form.cleaned_data["category"],
                 author=request.user if request.user.is_authenticated else None,
-                minutes_read=form.cleaned_data.get("minutes_read", 5),
             )
 
             ArticleStats.objects.create(article=article, views=0, likes=0, dislikes=0)
@@ -138,7 +136,6 @@ def edit_article(request, id):
             article.description = form.cleaned_data["description"]
             article.image_link = image_url
             article.category = form.cleaned_data["category"]
-            article.minutes_read = form.cleaned_data.get("minutes_read", 5)
             article.save()
             
             return redirect("article:article_by_id", id=id)
@@ -149,7 +146,6 @@ def edit_article(request, id):
             "description": article.description,
             "content": article.content,
             "category": article.category,
-            "minutes_read": article.minutes_read,
         })
     
     return render(request, "article/edit_article.html", {"form": form, "article": article})
@@ -219,3 +215,30 @@ def create_comment(request, id):
         "author_profile": author_profile,
     }
     return render(request, "article/article.html", context)
+
+def articles_filtered(request, filter):
+
+    articles = Article.objects.filter(is_confirmed=True).select_related("category", "author", "stats")
+    if(filter == "date"):
+        articles = articles.order_by("-created_on")
+    elif(filter == "popularity"):
+        articles = articles.order_by("-stats__likes", "-created_on")
+
+    articles_with_profiles = []
+    for article in articles:
+        author_profile, _ = UserProfile.objects.get_or_create(user=article.author)
+        articles_with_profiles.append({
+            "article": article,
+            "author_profile": author_profile,
+        })
+
+    featured_article = articles_with_profiles[0]["article"] if articles_with_profiles else None
+    featured_author_profile = articles_with_profiles[0]["author_profile"] if articles_with_profiles else None
+
+    context = {
+        "articles": articles,
+        "articles_with_profiles": articles_with_profiles,
+        "featured_article": featured_article,
+        "featured_author_profile": featured_author_profile,
+    }
+    return render(request, "main/main_view.html", context)

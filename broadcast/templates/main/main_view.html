@@ -13,8 +13,8 @@
                 <span class="text-cyan fw-bold small text-uppercase tracking-wider" style="letter-spacing: 2px;">Featured Article</span>
                 <span class="text-white-50 small ms-3">• {{ featured_article.minutes_read|default:5 }} Min Read</span>
             </div>
-            <h1 class="serif display-3 fw-bold mb-4" style="max-width: 800px; line-height: 1.2;">{{ featured_article.title }}</h1>
-            <p class="text-white-50 fs-5 mb-5" style="max-width: 600px; line-height: 1.6;">{{ featured_article.description }}</p>
+            <h1 class="serif display-3 fw-bold mb-4" style="max-width: 800px; line-height: 1.2;">{{ featured_article.title|truncatechars:35 }}</h1>
+            <p class="text-white-50 fs-5 mb-5" style="max-width: 600px; line-height: 1.6;">{{ featured_article.description|truncatechars:75 }}</p>
             <button class="btn btn-cyan px-5 py-3 fw-bold text-uppercase" style="letter-spacing: 1px;">Read Article →</button>
         </div>
     </a>
@@ -35,8 +35,14 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="serif h4">Secondary Stories</h2>
         <div class="btn-group border border-dev rounded overflow-hidden">
-            <button class="btn btn-sm btn-dark border-0">Grid</button>
-            <button class="btn btn-sm btn-outline-secondary border-0">List</button>
+            <a
+                href="?sort=date{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                class="btn btn-sm border-0 {% if sort_by == 'date' %}btn-cyan text-dark fw-bold{% else %}btn-dark text-white-50{% endif %}"
+            >Newest</a>
+            <a
+                href="?sort=popularity{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+                class="btn btn-sm border-0 {% if sort_by == 'popularity' %}btn-cyan text-dark fw-bold{% else %}btn-dark text-white-50{% endif %}"
+            >Most Liked</a>
         </div>
     </div>
 
@@ -69,10 +75,12 @@
                         </div>
                     </div>
                     <h5 class="serif h6 mb-2" style="line-height: 1.4;">
-                        <a href="{% url 'article:article_by_id' item.article.id %}" class="text-white text-decoration-none">{{ item.article.title }}</a>
+                        <a href="{% url 'article:article_by_id' item.article.id %}" class="text-white text-decoration-none">
+                            {{ item.article.title|truncatechars:35 }}
+                        </a>
                     </h5>
                     <p class="text-white-50 small mb-3" style="font-size: 0.75rem; line-height: 1.5; opacity: 0.85;">
-                        {{ item.article.description|truncatewords:15 }}
+                        {{ item.article.description|truncatechars:35 }}
                     </p>
                     <div class="d-flex justify-content-between align-items-center pt-3 border-top border-dev">
                         <span class="text-white-50 small" style="font-size: 0.7rem;">{{ item.article.created_on|date:"Y-m-d" }}</span>

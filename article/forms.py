@@ -33,15 +33,6 @@ class CreateNewsForm(forms.Form):
         required=True,
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
     )
-    minutes_read = forms.IntegerField(
-        label="Minutes to Read", 
-        required=True, 
-        min_value=1, 
-        max_value=120, 
-        initial=5,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Estimated reading time'})
-    )
-
 
     def clean_title(self):
         title = self.cleaned_data['title']
@@ -97,15 +88,6 @@ class EditArticleForm(forms.Form):
         required=False,
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
     )
-    minutes_read = forms.IntegerField(
-        label="Minutes to Read",
-        required=True,
-        min_value=1,
-        max_value=120,
-        initial=5,
-        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Estimated reading time'})
-    )
-
 
     def clean_title(self):
         title = self.cleaned_data['title']

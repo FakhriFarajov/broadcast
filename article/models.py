@@ -19,18 +19,6 @@ class Category(models.Model):
         return self.name
 
 
-class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    class Meta:
-        verbose_name = "Tag"
-        verbose_name_plural = "Tags"
-        ordering = ["name"]
-
-    def __str__(self):
-        return self.name
-
-
 class Article(models.Model):
     title = models.CharField(max_length=120)
     description = models.TextField()
@@ -43,7 +31,6 @@ class Article(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
-    tags = models.ManyToManyField(Tag, blank=True)
 
     class Meta:
         ordering = ["-created_on"]
@@ -52,6 +39,15 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+    def calculate_minutes_read(self, words_per_minute=200):
+        words_count = len(self.content.split()) if self.content else 0
+        return max(1, (words_count + words_per_minute - 1) // words_per_minute)
+
+    def save(self, *args, **kwargs):
+        # Keep reading time in sync whenever content changes.
+        self.minutes_read = self.calculate_minutes_read()
+        super().save(*args, **kwargs)
 
 
 class ArticleStats(models.Model):

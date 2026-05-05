@@ -7,9 +7,10 @@ from profile_user.models import UserProfile
 def main_view(request):
     selected_category = request.GET.get('category')
     search_query = request.GET.get('q', '').strip()
+    sort_by = request.GET.get('sort', 'date')
     
     # Get articles from database
-    articles = Article.objects.all().select_related('category')
+    articles = Article.objects.all().select_related('category', 'author', 'stats')
 
     if selected_category:
         articles = articles.filter(category__name=selected_category)
@@ -23,6 +24,13 @@ def main_view(request):
             Q(author__icontains=search_query) |
             Q(category__name__icontains=search_query)
         )
+
+    if sort_by == 'popularity':
+        # Top-to-bottom by likes.
+        articles = articles.order_by('-stats__likes', '-created_on')
+    else:
+        sort_by = 'date'
+        articles = articles.order_by('-created_on')
 
     # Get author profiles for each article
     articles_with_profiles = []
@@ -47,5 +55,6 @@ def main_view(request):
         'articles_with_profiles': articles_with_profiles,
         'featured_article': featured_article,
         'featured_author_profile': featured_author_profile,
+        'sort_by': sort_by,
     }
     return render(request, 'main/main_view.html', context)
