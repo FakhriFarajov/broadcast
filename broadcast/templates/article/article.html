@@ -63,7 +63,12 @@
                                 {% endif %}
                             </button>
                         </form>
-                        <button class="btn btn-ghost btn-sm px-3" type="button">
+                        <button
+                            id="share-article-btn"
+                            class="btn btn-ghost btn-sm px-3"
+                            type="button"
+                            data-share-url="{{ request.build_absolute_uri }}"
+                        >
                             🔗 Share
                         </button>
                     </div>
@@ -101,9 +106,6 @@
                     <h3 class="h4 text-white mb-0">
                         Discussion ({{ comment_count }})
                     </h3>
-                    <button class="btn btn-cyan btn-sm px-4">
-                        Add Comment
-                    </button>
                 </div>
 
                 <div class="card card-dev p-4 mb-4">
@@ -158,4 +160,48 @@
         </div>
     </div>
 </div>
+<script>
+    (function () {
+        const shareButton = document.getElementById("share-article-btn");
+        if (!shareButton) return;
+
+        const originalLabel = shareButton.textContent;
+
+        function showCopiedState(text) {
+            shareButton.textContent = text;
+            setTimeout(function () {
+                shareButton.textContent = originalLabel;
+            }, 1400);
+        }
+
+        async function copyLink(url) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(url);
+                return;
+            }
+
+            const tempInput = document.createElement("input");
+            tempInput.value = url;
+            tempInput.style.position = "fixed";
+            tempInput.style.left = "-9999px";
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            const copied = document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            if (!copied) {
+                throw new Error("Copy failed");
+            }
+        }
+
+        shareButton.addEventListener("click", async function () {
+            const url = shareButton.dataset.shareUrl || window.location.href;
+            try {
+                await copyLink(url);
+                showCopiedState("Copied!");
+            } catch (error) {
+                window.prompt("Copy this link:", url);
+            }
+        });
+    })();
+</script>
 {% endblock %}

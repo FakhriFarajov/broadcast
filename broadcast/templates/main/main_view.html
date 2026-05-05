@@ -51,6 +51,7 @@
         {% for item in articles_with_profiles %}
 
         <div class="col">
+            <a href="{% url 'article:article_by_id' item.article.id %}" class="text-decoration-none d-block h-100">
             <div class="card card-dev h-100 border-0" style="cursor: pointer;">
                 <div class="position-relative overflow-hidden rounded-top">
                     <img src="{{ item.article.image_link }}" class="w-100 img-aspect" alt="{{ item.article.title }}" style="border-radius: 4px 4px 0 0;">
@@ -74,10 +75,8 @@
                             {{ item.article.minutes_read|default:5 }} min
                         </div>
                     </div>
-                    <h5 class="serif h6 mb-2" style="line-height: 1.4;">
-                        <a href="{% url 'article:article_by_id' item.article.id %}" class="text-white text-decoration-none">
-                            {{ item.article.title|truncatechars:35 }}
-                        </a>
+                    <h5 class="serif h6 mb-2 text-white" style="line-height: 1.4;">
+                        {{ item.article.title|truncatechars:35 }}
                     </h5>
                     <p class="text-white-50 small mb-3" style="font-size: 0.75rem; line-height: 1.5; opacity: 0.85;">
                         {{ item.article.description|truncatechars:35 }}
@@ -88,6 +87,7 @@
                     </div>
                 </div>
             </div>
+            </a>
         </div>
         {% empty %}
         {% endfor %}
