@@ -407,6 +407,11 @@
                     <span class="input-group-text">Search</span>
                 </form>
 
+                {% if request.user.is_authenticated and request.user.profile.role == 'super_admin' %}
+                <a href="{% url 'account:dashboard' %}" class="btn btn-sm btn-ghost text-uppercase fw-bold px-3 text-nowrap" style="font-size: 0.7rem; border-color: var(--brand-cyan); color: var(--brand-cyan);">
+                    Dashboard
+                </a>
+                {% endif %}
                 <a href="{% if request.user.is_authenticated %}{% url 'profile:profile' %}{% else %}{% url 'account:login' %}{% endif %}" class="btn btn-sm btn-ghost text-uppercase fw-bold px-3 text-nowrap" style="font-size: 0.7rem;">
                     {% if request.user.is_authenticated %}Profile{% else %}Login{% endif %}
                 </a>

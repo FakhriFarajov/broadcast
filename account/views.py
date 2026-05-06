@@ -1,8 +1,38 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 
 from account.forms import RegisterForm, LoginForm
+from profile_user.models import UserProfile
+
+
+def _get_role(user):
+    try:
+        return user.profile.role
+    except Exception:
+        return 'user'
+
+
+#Decorators
+def super_admin_required(view_func):
+    from functools import wraps
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if not request.user.is_authenticated or _get_role(request.user) != 'super_admin':
+            return redirect('main:main')
+        return view_func(request, *args, **kwargs)
+    return _wrapped
+
+
+def admin_or_super_required(view_func):
+    from functools import wraps
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if not request.user.is_authenticated or _get_role(request.user) not in ('super_admin', 'admin'):
+            return redirect('main:main')
+        return view_func(request, *args, **kwargs)
+    return _wrapped
 
 
 def register_view(request):
@@ -49,3 +79,38 @@ def logout_view(request):
     from django.contrib.auth import logout as auth_logout
     auth_logout(request)
     return redirect("account:login")
+
+
+@login_required
+@admin_or_super_required
+def dashboard_view(request):
+    users = User.objects.select_related('profile').all().order_by('id')
+    users_data = []
+    for u in users:
+        profile, _ = UserProfile.objects.get_or_create(user=u)
+        users_data.append({'user': u, 'profile': profile})
+    return render(request, 'account/dashboard.html', {'users_data': users_data})
+
+
+@login_required
+@super_admin_required
+def ban_user_view(request, user_id):
+    if request.method == 'POST':
+        target = get_object_or_404(User, id=user_id)
+        if target != request.user:
+            target.is_active = not target.is_active
+            target.save(update_fields=['is_active'])
+    return redirect('account:dashboard')
+
+
+@login_required
+@super_admin_required
+def set_role_view(request, user_id):
+    if request.method == 'POST':
+        target = get_object_or_404(User, id=user_id)
+        new_role = request.POST.get('role', 'user')
+        if new_role in ('super_admin', 'admin', 'user') and target != request.user:
+            profile, _ = UserProfile.objects.get_or_create(user=target)
+            profile.role = new_role
+            profile.save(update_fields=['role'])
+    return redirect('account:dashboard')

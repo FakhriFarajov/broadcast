@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard – DevStream{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5 pt-5 pb-5">
+
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+            <p class="text-cyan small fw-bold text-uppercase mb-1" style="letter-spacing: 3px;">Super Admin</p>
+            <h1 class="serif display-5 fw-bold text-white mb-0">User Dashboard</h1>
+        </div>
+        <span class="badge border border-cyan text-cyan px-3 py-2" style="font-size: 0.75rem; letter-spacing: 1px;">
+            {{ users_data|length }} total users
+        </span>
+    </div>
+
+    <div class="card card-dev border-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: var(--card-bg);">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <th class="px-4 py-3 text-cyan small fw-bold text-uppercase" style="letter-spacing: 1px;">#</th>
+                        <th class="px-4 py-3 text-cyan small fw-bold text-uppercase" style="letter-spacing: 1px;">User</th>
+                        <th class="px-4 py-3 text-cyan small fw-bold text-uppercase" style="letter-spacing: 1px;">Email</th>
+                        <th class="px-4 py-3 text-cyan small fw-bold text-uppercase" style="letter-spacing: 1px;">Role</th>
+                        <th class="px-4 py-3 text-cyan small fw-bold text-uppercase" style="letter-spacing: 1px;">Status</th>
+                        <th class="px-4 py-3 text-cyan small fw-bold text-uppercase" style="letter-spacing: 1px;">Joined</th>
+                        <th class="px-4 py-3 text-cyan small fw-bold text-uppercase" style="letter-spacing: 1px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in users_data %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td class="px-4 py-3 text-white-50 small">{{ item.user.id }}</td>
+
+                        <!-- Avatar + username -->
+                        <td class="px-4 py-3">
+                            <div class="d-flex align-items-center gap-3">
+                                {% if item.profile.image %}
+                                    <img src="{{ item.profile.image.url }}" class="rounded-circle border border-cyan"
+                                         style="width:36px;height:36px;object-fit:cover;" alt="{{ item.user.username }}">
+                                {% else %}
+                                    <div class="d-flex align-items-center justify-content-center rounded-circle bg-dark border border-dev"
+                                         style="width:36px;height:36px;font-size:1rem;color:var(--brand-cyan);">
+                                        {{ item.user.username|slice:":1"|upper }}
+                                    </div>
+                                {% endif %}
+                                <span class="text-white fw-bold">{{ item.user.username }}</span>
+                                {% if item.user == request.user %}
+                                    <span class="badge text-dark" style="background:var(--brand-cyan);font-size:0.6rem;">You</span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                        <!-- Email -->
+                        <td class="px-4 py-3 text-white-50 small">{{ item.user.email|default:"—" }}</td>
+
+                        <!-- Role -->
+                        <td class="px-4 py-3">
+                            {% if item.profile.role == 'super_admin' %}
+                                <span class="badge border border-cyan text-cyan px-2 py-1">Super Admin</span>
+                            {% elif item.profile.role == 'admin' %}
+                                <span class="badge border border-dev text-white-50 px-2 py-1">Admin</span>
+                            {% else %}
+                                <span class="badge border border-dev text-white-50 px-2 py-1" style="opacity:0.5;">User</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Active/Banned -->
+                        <td class="px-4 py-3">
+                            {% if item.user.is_active %}
+                                <span class="badge text-dark fw-bold px-2 py-1" style="background:#22c55e;font-size:0.65rem;">Active</span>
+                            {% else %}
+                                <span class="badge text-white fw-bold px-2 py-1" style="background:#ef4444;font-size:0.65rem;">Banned</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Joined -->
+                        <td class="px-4 py-3 text-white-50 small">{{ item.user.date_joined|date:"Y-m-d" }}</td>
+
+                        <!-- Actions -->
+                        <td class="px-4 py-3">
+                            {% if item.user != request.user %}
+                            <div class="d-flex gap-2 flex-wrap">
+                                <!-- Ban / Unban -->
+                                <form method="post" action="{% url 'account:ban_user' item.user.id %}">
+                                    {% csrf_token %}
+                                    {% if item.user.is_active %}
+                                        <button type="submit" class="btn btn-sm px-3 fw-bold"
+                                                style="background:#ef4444;border:none;color:#fff;font-size:0.7rem;letter-spacing:0.5px;">
+                                            Ban
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-sm px-3 fw-bold"
+                                                style="background:#22c55e;border:none;color:#000;font-size:0.7rem;letter-spacing:0.5px;">
+                                            Unban
+                                        </button>
+                                    {% endif %}
+                                </form>
+
+                                <!-- Set Role -->
+                                <form method="post" action="{% url 'account:set_role' item.user.id %}" class="d-flex gap-1">
+                                    {% csrf_token %}
+                                    <select name="role" class="form-select form-select-sm"
+                                            style="background:#090e1a;border:1px solid var(--border-color);color:#fff;font-size:0.7rem;min-width:100px;">
+                                        <option value="user"        {% if item.profile.role == 'user' %}selected{% endif %}>User</option>
+                                        <option value="admin"       {% if item.profile.role == 'admin' %}selected{% endif %}>Admin</option>
+                                        <option value="super_admin" {% if item.profile.role == 'super_admin' %}selected{% endif %}>Super Admin</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-cyan fw-bold px-3" style="font-size:0.7rem;">
+                                        Set
+                                    </button>
+                                </form>
+                            </div>
+                            {% else %}
+                            <span class="text-white-50 small">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-white-50">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
