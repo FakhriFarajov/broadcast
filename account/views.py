@@ -7,19 +7,13 @@ from account.forms import RegisterForm, LoginForm
 from profile_user.models import UserProfile
 
 
-def _get_role(user):
-    try:
-        return user.profile.role
-    except Exception:
-        return 'user'
-
 
 #Decorators
 def super_admin_required(view_func):
     from functools import wraps
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
-        if not request.user.is_authenticated or _get_role(request.user) != 'super_admin':
+        if not request.user.is_authenticated or (request.user.profile.role) != 'super_admin':
             return redirect('main:main')
         return view_func(request, *args, **kwargs)
     return _wrapped
@@ -29,7 +23,7 @@ def admin_or_super_required(view_func):
     from functools import wraps
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
-        if not request.user.is_authenticated or _get_role(request.user) not in ('super_admin', 'admin'):
+        if not request.user.is_authenticated or (request.user.profile.role) not in ('super_admin', 'admin'):
             return redirect('main:main')
         return view_func(request, *args, **kwargs)
     return _wrapped
